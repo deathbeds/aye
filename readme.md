@@ -10,19 +10,10 @@
 
 
 ```python
-    try:                        import eye.tests.basics
+    try:                        import eye.tests.test_basics
     except ModuleNotFoundError: import eye.activate
-    finally:                    import eye.tests.basics
-```
-
-
-```python
-    eye.tests.basics.__complete__
-```
-
-
-```python
-    eye.tests.basics.
+    finally:                    import eye.tests.test_basics
+    assert eye.tests.test_basics.__complete__ is True
 ```
 
 

@@ -224,18 +224,6 @@ def new_decoder():
     return decoder
 
 
-# ### Meta Finder versus Path Finder
-
-# In[9]:
-
-
-__test__ = dict(
-    scope = """
-    >>> update_hooks(Notebook)
-    >>> import Untitled304 as nb
-    >>> assert reload(nb)""")
-
-
 # # Literate Markdown Tools
 
 # In[10]:
@@ -400,23 +388,17 @@ def repr_markdown(module):
     
 
 
-# In[24]:
+# In[ ]:
 
 
 if __name__ ==  '__main__':
     from IPython import get_ipython
-    __import__('doctest').testmod(verbose=2)
+    #         __import__('doctest').testmod(verbose=2)
+    get_ipython().system('source activate p6 && py.test')
     get_ipython().system('jupyter nbconvert --to script --output __init__ eye.ipynb')
     get_ipython().system('pyreverse -o png -p eye -A __init__.py')
     get_ipython().system('ipython -m pydoc -- -w eye')
     get_ipython().system('cp eye.html ../docs/index.html')
-    from IPython.display import display, Image, IFrame, HTML, Markdown as Text
-    from pathlib import Path
-    from html import escape
-    display(Text("""### UML Diagram"""),
-            Image('classes_eye.png', embed=True),  HTML("""
-            <iframe width="800" height="600" style="resize: both;"srcdoc='%s' ></iframe>"""
-                                                        % escape(Path('eye.html').read_text())))
 
 
 # # Permissive Markdown Source

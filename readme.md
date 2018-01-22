@@ -17,7 +17,18 @@
 
 
 ```python
+    eye.tests.basics.__complete__
+```
+
+
+```python
+    eye.tests.basics.
+```
+
+
+```python
 if __name__ == '__main__':
-    !python setup.py develop
+#     !python setup.py develop
+    !source activate p6 && py.test
     !jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True readme.ipynb
 ```

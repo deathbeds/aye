@@ -27,7 +27,7 @@ The [`eye/tests`](eye/tests/) explains more about the basic and advanced feature
 
 ```python
     import eye.tests.test_basics
-    assert eye.tests.test_basics.__complete__
+    assert eye.tests.test_basics.__complete__ is True
 ```
 
 

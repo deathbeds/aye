@@ -20,7 +20,7 @@ Imported notebooks are reloadable.
     assert reload(readme) is readme
 ```
 
-The `eye/tests` explains more about the basic and advanced features of `eye` 
+The [`eye/tests`](eye/tests/) explains more about the basic and advanced features of `eye` 
 
 > `eye.tests` are importable.
 

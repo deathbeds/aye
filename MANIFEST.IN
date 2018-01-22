@@ -1,1 +1,2 @@
 include eye/tests/*.ipynb
+include eye/tests/readme.md

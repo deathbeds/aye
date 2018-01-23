@@ -6,8 +6,18 @@
 # In[1]:
 
 
-__doc__ = """This notebook creates a module named `eye`.  `eye` 
-allows users to import notebooks as Python modules with _sorta_ improved debugging features."""
+__doc__ = """
+This notebook creates a module named `eye`.  `eye` 
+allows users to import notebooks as Python modules with _sorta_ improved debugging features.
+
+# Suppressing expressions when importing notebooks
+
+Use the condition 
+
+    __name__ == '__main__'
+
+as a control flow to ignore stay
+"""
 
 
 # ## Updating `sys.path_hooks`
@@ -58,7 +68,7 @@ from IPython.utils.capture import capture_output
 from IPython.display import publish_display_data
 
 
-# In[4]:
+# In[30]:
 
 
 from contextlib import contextmanager
@@ -67,14 +77,6 @@ def Import(*loaders, capture=False):
     """A contextmanager that modifies the sys.path_hooks and returns them 
     to their original state.
     
-    >>> with Import(): import Untitled304 as nb
-    >>> with Import(): assert reload(nb)
-    
-    `reload` will not work with objects import with a scope.
-    >>> try: 
-    ...     reload(nb)
-    ...     assert False
-    ... except AttributeError as Exception: assert True
     """
     if capture:
         with capture_output() as captured:
@@ -93,7 +95,7 @@ def Import(*loaders, capture=False):
 
 # # Notebook Source File Loader
 
-# In[5]:
+# In[31]:
 
 
 from importlib.machinery import SourceFileLoader
@@ -118,7 +120,7 @@ from importlib.machinery import SourceFileLoader
 #     
 # to return a __traceback__.  A successful import will `assert nb.__complete__`.
 
-# In[6]:
+# In[32]:
 
 
 class Partial(SourceFileLoader):
@@ -159,12 +161,12 @@ class Partial(SourceFileLoader):
             _bootstrap._call_with_frames_removed(exec, code, module.__dict__, module.__dict__)
             module.__complete__ = True
         except BaseException as Exception: module.__complete__ = Exception
-        return repr_markdown(module)
+        return module #repr_markdown(module)
     
     __complete__ = False
 
 
-# In[7]:
+# In[33]:
 
 
 class Notebook(Partial):
@@ -190,7 +192,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[8]:
+# In[34]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -206,10 +208,7 @@ def NBDecoder(s_and_end, strict, scan_once, object_hook,
         type, object = object['cell_type'], object['source']
         object = ''.join(object) if isinstance(object, list) else object            
         id = doc.count('\n', 0, id + doc[id:next].find(object and object.splitlines()[0] or 'source'))
-        object = id, (
-            object if type == 'code' 
-            else indent("""__doc__ += '''\n{}'''""".format(object))
-        )
+        object = id, (object if type == 'code' else comment_lines(object))
     elif 'cells' in object:
         object = object['cells']
 
@@ -226,7 +225,7 @@ def new_decoder():
 
 # # Literate Markdown Tools
 
-# In[10]:
+# In[35]:
 
 
 from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
@@ -239,7 +238,7 @@ class Markdown(MarkdownWithMath):
         return [super().render(text), ipython2python(Markdown.renderer.source)][-1]
 
 
-# In[11]:
+# In[36]:
 
 
 class Renderer(IPythonRenderer):
@@ -252,7 +251,7 @@ class Renderer(IPythonRenderer):
         return super().block_code(str, lang=lang)
 
 
-# In[12]:
+# In[37]:
 
 
 class Literate(Notebook):
@@ -263,7 +262,7 @@ class Literate(Notebook):
             yield id, (md.render(str), md.renderer.source)[-1]
 
 
-# In[13]:
+# In[38]:
 
 
 class MD(Partial):
@@ -280,7 +279,7 @@ class MD(Partial):
 
 # # Utilities
 
-# In[14]:
+# In[39]:
 
 
 import sys
@@ -326,7 +325,7 @@ def parameterize(nb):
     return run
 
 
-# In[15]:
+# In[40]:
 
 
 def lines_to_ast(lines):
@@ -341,18 +340,26 @@ def lines_to_ast(lines):
     return module
 
 
-# In[16]:
+# In[41]:
 
 
 def from_file(path, loader=Notebook, capture=False):
     """from_file loads paths as modules with a specified loader.
     
-    >>> assert from_file('eye.ipynb').__complete__ is True
+    >>> m = from_file('eye.ipynb')
+    >>> mods = set(dir(__import__('sys').modules))
+    >>> assert m.__complete__ is True
+    >>> assert m.__name__
+    >>> assert len(set(dir(__import__('sys').modules)) - mods) is 0
     """
     from importlib.util import spec_from_file_location, module_from_spec
     from types import ModuleType
-    loader = loader(path, path)
-    module = module_from_spec(spec_from_file_location(loader.name, loader.path, loader=loader))
+    # module = module_from_spec(spec_from_file_location(loader.name, loader.path, loader=loader))
+    # Create the module by hand to avoid the package name winding up in the sys.modules.
+    module = ModuleType(path, """""")
+    module.__loader__ = loader(path, path)
+    module.__path__ = path
+    
     if capture:
         with capture_output() as captured:
             module.__loader__.exec_module(module)
@@ -362,7 +369,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[17]:
+# In[42]:
 
 
 def repr_markdown(module):
@@ -377,23 +384,12 @@ def repr_markdown(module):
     return module
 
 
-# In[18]:
-
-
-#     __doc__ = """[i]: https://docs.python.org/3/reference/import.html
-#     [302]: https://www.python.org/dev/peps/pep-0302/
-#     [304]: https://www.python.org/dev/peps/pep-0304/
-#     [hooks]: https://docs.python.org/3/library/sys.html#sys.path_hooks
-#     """
-    
-
-
-# In[ ]:
+# In[43]:
 
 
 if __name__ ==  '__main__':
     from IPython import get_ipython
-    #         __import__('doctest').testmod(verbose=2)
+    __import__('doctest').testmod(verbose=2)
     get_ipython().system('source activate p6 && py.test')
     get_ipython().system('jupyter nbconvert --to script --output __init__ eye.ipynb')
     get_ipython().system('pyreverse -o png -p eye -A __init__.py')

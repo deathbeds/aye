@@ -1,6 +1,6 @@
 __import__('setuptools').setup(
     name="aye",
-    version="0.0.🖕",
+    version="0.0.1",
     author="Tony Fast", author_email="tony.fast@gmail.com",
     description="Interactive Notebook Modules.", 
     license="BSD-3-Clause",

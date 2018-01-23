@@ -30,6 +30,14 @@ The [`eye/tests`](eye/tests/) explains more about the basic and advanced feature
     assert eye.tests.test_basics.__complete__ is True
 ```
 
+Partially loaded notebooks contain an `Exception` on the __complete__ attribute.
+
+
+```python
+    import eye.tests.debug
+    assert type(eye.tests.debug.__complete__) is AssertionError
+```
+
 
 ```python
 if __name__ == '__main__':

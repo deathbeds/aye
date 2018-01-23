@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# `eye` creates tools to load 
+# `aye` creates tools to load 
 
 # In[1]:
 
 
 __doc__ = """
-This notebook creates a module named `eye`.  `eye` 
+This notebook creates a module named `aye`.  `aye` 
 allows users to import notebooks as Python modules with _sorta_ improved debugging features.
 
 # Suppressing expressions when importing notebooks
@@ -68,7 +68,7 @@ from IPython.utils.capture import capture_output
 from IPython.display import publish_display_data
 
 
-# In[30]:
+# In[4]:
 
 
 from contextlib import contextmanager
@@ -95,7 +95,7 @@ def Import(*loaders, capture=False):
 
 # # Notebook Source File Loader
 
-# In[31]:
+# In[5]:
 
 
 from importlib.machinery import SourceFileLoader
@@ -120,7 +120,7 @@ from importlib.machinery import SourceFileLoader
 #     
 # to return a __traceback__.  A successful import will `assert nb.__complete__`.
 
-# In[32]:
+# In[6]:
 
 
 class Partial(SourceFileLoader):
@@ -166,7 +166,7 @@ class Partial(SourceFileLoader):
     __complete__ = False
 
 
-# In[33]:
+# In[7]:
 
 
 class Notebook(Partial):
@@ -192,7 +192,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[34]:
+# In[8]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -225,7 +225,7 @@ def new_decoder():
 
 # # Literate Markdown Tools
 
-# In[35]:
+# In[9]:
 
 
 from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
@@ -238,11 +238,11 @@ class Markdown(MarkdownWithMath):
         return [super().render(text), ipython2python(Markdown.renderer.source)][-1]
 
 
-# In[36]:
+# In[10]:
 
 
 class Renderer(IPythonRenderer):
-    """A mistune.Renderer to use with `eye.Markdown`."""
+    """A mistune.Renderer to use with `aye.Markdown`."""
     def __init__(Renderer, *args, **kwargs): 
         Renderer.source = super().__init__(*args, **kwargs) or """"""
 
@@ -251,7 +251,7 @@ class Renderer(IPythonRenderer):
         return super().block_code(str, lang=lang)
 
 
-# In[37]:
+# In[11]:
 
 
 class Literate(Notebook):
@@ -262,7 +262,7 @@ class Literate(Notebook):
             yield id, (md.render(str), md.renderer.source)[-1]
 
 
-# In[38]:
+# In[12]:
 
 
 class MD(Partial):
@@ -279,7 +279,7 @@ class MD(Partial):
 
 # # Utilities
 
-# In[39]:
+# In[13]:
 
 
 import sys
@@ -325,7 +325,7 @@ def parameterize(nb):
     return run
 
 
-# In[40]:
+# In[14]:
 
 
 def lines_to_ast(lines):
@@ -340,13 +340,13 @@ def lines_to_ast(lines):
     return module
 
 
-# In[41]:
+# In[15]:
 
 
 def from_file(path, loader=Notebook, capture=False):
     """from_file loads paths as modules with a specified loader.
     
-    >>> m = from_file('eye.ipynb')
+    >>> m = from_file('aye.ipynb')
     >>> mods = set(dir(__import__('sys').modules))
     >>> assert m.__complete__ is True
     >>> assert m.__name__
@@ -369,11 +369,11 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[42]:
+# In[16]:
 
 
 def repr_markdown(module):
-    """Attach a [Markdown Formatter][format] to modules loaded by `eye`.
+    """Attach a [Markdown Formatter][format] to modules loaded by `aye`.
     
     [format]: http://ipython.readthedocs.io/en/stable/api/generated/IPython.core.formatters.html#IPython.core.formatters.MarkdownFormatter
     """
@@ -384,17 +384,17 @@ def repr_markdown(module):
     return module
 
 
-# In[43]:
+# In[19]:
 
 
 if __name__ ==  '__main__':
     from IPython import get_ipython
     __import__('doctest').testmod(verbose=2)
     get_ipython().system('source activate p6 && py.test')
-    get_ipython().system('jupyter nbconvert --to script --output __init__ eye.ipynb')
-    get_ipython().system('pyreverse -o png -p eye -A __init__.py')
-    get_ipython().system('ipython -m pydoc -- -w eye')
-    get_ipython().system('cp eye.html ../docs/index.html')
+    get_ipython().system('jupyter nbconvert --to script --output __init__ aye.ipynb')
+    get_ipython().system('pyreverse -o png -p aye -A __init__.py')
+    get_ipython().system('ipython -m pydoc -- -w aye')
+    get_ipython().system('mv aye.html ../docs/index.html')
 
 
 # # Permissive Markdown Source
@@ -440,7 +440,7 @@ def register_transforms(ip=None):
 # 
 #     [publish_display_data(object.data) for object in nb.__output__.outputs];
 
-# from eye import update_hooks, Notebook
+# from aye import update_hooks, Notebook
 # update_hooks(Notebook)
 # 
 # 

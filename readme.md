@@ -8,7 +8,7 @@
 
 
 ```python
-    import eye.activate
+    import aye.activate
     import readme
 ```
 
@@ -20,28 +20,28 @@ Imported notebooks are reloadable.
     assert reload(readme) is readme
 ```
 
-The [`eye/tests`](eye/tests/) explains more about the basic and advanced features of `eye` 
+The [`aye/tests`](eye/tests/) explains more about the basic and advanced features of `aye` 
 
-> `eye.tests` are importable.
+> `aye.tests` are importable.
 
 
 ```python
-    import eye.tests.test_basics
-    assert eye.tests.test_basics.__complete__ is True
+    import aye.tests.test_basics
+    assert aye.tests.test_basics.__complete__ is True
 ```
 
 Partially loaded notebooks contain an `Exception` on the __complete__ attribute.
 
 
 ```python
-    import eye.tests.debug
-    assert type(eye.tests.debug.__complete__) is AssertionError
+    import aye.tests.debug
+    assert type(aye.tests.debug.__complete__) is AssertionError
 ```
 
 
 ```python
     if __name__ == '__main__':
-    #     !source activate p6 && python setup.py develop
+        !source activate p6 && python setup.py develop
         !source activate p6 && python setup.py pytest
         !jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True readme.ipynb
 ```

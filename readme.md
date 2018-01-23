@@ -40,8 +40,8 @@ Partially loaded notebooks contain an `Exception` on the __complete__ attribute.
 
 
 ```python
-if __name__ == '__main__':
-#     !python setup.py develop
-    !source activate p6 && py.test
-    !jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True readme.ipynb
+    if __name__ == '__main__':
+    #     !source activate p6 && python setup.py develop
+        !source activate p6 && python setup.py pytest
+        !jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True readme.ipynb
 ```

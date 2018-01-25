@@ -309,23 +309,42 @@ def vars_to_sig(vars):
     from inspect import Parameter, Signature
     return Signature([Parameter(str, Parameter.KEYWORD_ONLY, default = vars[str]) for str in vars])
 
+
+# In[63]:
+
+
+def copy_module(module):
+    from types import ModuleType
+    new = ModuleType(module.__name__, module.__doc__)
+    new.__dict__.update(module.__dict__)
+    return new
+
+
+# In[64]:
+
+
 def parameterize(nb):
-    AST = ast(nb)
+    module = copy_module(nb)
+    AST = ast(module)
     variables, AST = free_expressions(AST)
+    for variable in variables: 
+        if variable in module.__dict__: module.__dict__.pop(variable)
+    
+    module.__dict__.update(variables)
+    
     def run(**kwargs): 
-        variables.update(__doc__="""""")
-        variables.update(kwargs)
+        module.__dict__.update(kwargs)
         exec(
-            compile(AST, nb.__file__, 'exec'), 
-            variables, variables
-        )
+            compile(AST, module.__file__, 'exec'), 
+            module.__dict__, module.__dict__)
+        return module
     run._variables = variables
     run.__signature__ = vars_to_sig(variables)
     run.__doc__ = nb.__doc__
     return run
 
 
-# In[14]:
+# In[65]:
 
 
 def lines_to_ast(lines):
@@ -340,7 +359,7 @@ def lines_to_ast(lines):
     return module
 
 
-# In[15]:
+# In[66]:
 
 
 def from_file(path, loader=Notebook, capture=False):
@@ -352,13 +371,13 @@ def from_file(path, loader=Notebook, capture=False):
     >>> assert m.__name__
     >>> assert len(set(dir(__import__('sys').modules)) - mods) is 0
     """
+    from importlib._bootstrap import _init_module_attrs
     from importlib.util import spec_from_file_location, module_from_spec
     from types import ModuleType
-    # module = module_from_spec(spec_from_file_location(loader.name, loader.path, loader=loader))
+    # module = module_from_spec()
     # Create the module by hand to avoid the package name winding up in the sys.modules.
-    module = ModuleType(path, """""")
-    module.__loader__ = loader(path, path)
-    module.__path__ = path
+    module = _init_module_attrs(
+        spec_from_file_location(path, path, loader=loader(path, path)), ModuleType(path, """"""))
     
     if capture:
         with capture_output() as captured:
@@ -369,7 +388,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[16]:
+# In[67]:
 
 
 def repr_markdown(module):
@@ -384,14 +403,14 @@ def repr_markdown(module):
     return module
 
 
-# In[19]:
+# In[ ]:
 
 
-if __name__ ==  '__main__':
+if 1 and __name__ ==  '__main__':
     from IPython import get_ipython
     __import__('doctest').testmod(verbose=2)
-    get_ipython().system('source activate p6 && py.test')
     get_ipython().system('jupyter nbconvert --to script --output __init__ aye.ipynb')
+    get_ipython().system('source activate p6 && py.test')
     get_ipython().system('pyreverse -o png -p aye -A __init__.py')
     get_ipython().system('ipython -m pydoc -- -w aye')
     get_ipython().system('mv aye.html ../docs/index.html')
@@ -403,7 +422,7 @@ if __name__ ==  '__main__':
 # 
 # [transform]: http://ipython.readthedocs.io/en/stable/config/inputtransforms.html#transforming-a-full-block
 
-# In[20]:
+# In[69]:
 
 
 from IPython.core.inputtransformer import InputTransformer
@@ -417,7 +436,7 @@ class Transformer(__import__('collections').UserList, InputTransformer):
 
 # ### Indenting Code
 
-# In[21]:
+# In[70]:
 
 
 def register_transforms(ip=None):
@@ -430,10 +449,18 @@ def register_transforms(ip=None):
     ip.input_transformer_manager.python_line_transforms = [Transformer()]
 
 
-#     nb = from_file('Untitled325.ipynb', capture=True)
-# 
-#     f = parameterize(nb)
-# 
+# In[74]:
+
+
+if __name__ == '__main__':
+    nb = from_file('aye.ipynb', capture=True)
+
+    f = parameterize(nb)
+    
+
+    m = f(x=42)
+
+
 #     from ipywidgets import interact
 # 
 #     interact(f)

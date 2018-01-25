@@ -27,7 +27,7 @@ as a control flow to ignore stay
 # [302]: https://www.python.org/dev/peps/pep-0302/#id28
 # [imp]: https://docs.python.org/3/reference/import.html#import-hooks
 
-# In[2]:
+# In[90]:
 
 
 def update_hooks(*loaders):
@@ -45,9 +45,10 @@ def update_hooks(*loaders):
             __closure__ = getattr(hook, '__closure__', None)
             if __closure__ and issubclass(__closure__[0].cell_contents, FileFinder):
                 _NATIVE_HOOK = globals().get('_NATIVE_HOOK', (i, hook))
-                sys.path_hooks[i] = FileFinder.path_hook(*(
-                    (loader, loader.EXTENSION_SUFFIXES) for loader in loaders
-                ), *_NATIVE_HOOK[1].__closure__[1].cell_contents)
+                sys.path_hooks[i] = FileFinder.path_hook(
+                    *_NATIVE_HOOK[1].__closure__[1].cell_contents,
+                    *((loader, loader.EXTENSION_SUFFIXES) for loader in loaders
+                ))
     else:
         sys.path_hooks[_NATIVE_HOOK[0]] = _NATIVE_HOOK[1]
             
@@ -61,14 +62,14 @@ def update_hooks(*loaders):
 # [jup]: http://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Importing%20Notebooks.html#Register-the-hook
 # [importable]: https://github.com/tonyfast/importable/blob/master/importable.py#L83
 
-# In[3]:
+# In[91]:
 
 
 from IPython.utils.capture import capture_output
 from IPython.display import publish_display_data
 
 
-# In[4]:
+# In[92]:
 
 
 from contextlib import contextmanager
@@ -95,7 +96,7 @@ def Import(*loaders, capture=False):
 
 # # Notebook Source File Loader
 
-# In[5]:
+# In[93]:
 
 
 from importlib.machinery import SourceFileLoader
@@ -120,7 +121,7 @@ from importlib.machinery import SourceFileLoader
 #     
 # to return a __traceback__.  A successful import will `assert nb.__complete__`.
 
-# In[6]:
+# In[94]:
 
 
 class Partial(SourceFileLoader):
@@ -166,7 +167,7 @@ class Partial(SourceFileLoader):
     __complete__ = False
 
 
-# In[7]:
+# In[95]:
 
 
 class Notebook(Partial):
@@ -192,7 +193,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[8]:
+# In[96]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -225,7 +226,7 @@ def new_decoder():
 
 # # Literate Markdown Tools
 
-# In[9]:
+# In[97]:
 
 
 from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
@@ -238,7 +239,7 @@ class Markdown(MarkdownWithMath):
         return [super().render(text), ipython2python(Markdown.renderer.source)][-1]
 
 
-# In[10]:
+# In[98]:
 
 
 class Renderer(IPythonRenderer):
@@ -251,7 +252,7 @@ class Renderer(IPythonRenderer):
         return super().block_code(str, lang=lang)
 
 
-# In[11]:
+# In[99]:
 
 
 class Literate(Notebook):
@@ -262,7 +263,7 @@ class Literate(Notebook):
             yield id, (md.render(str), md.renderer.source)[-1]
 
 
-# In[12]:
+# In[100]:
 
 
 class MD(Partial):
@@ -279,7 +280,7 @@ class MD(Partial):
 
 # # Utilities
 
-# In[13]:
+# In[101]:
 
 
 import sys
@@ -310,7 +311,7 @@ def vars_to_sig(vars):
     return Signature([Parameter(str, Parameter.KEYWORD_ONLY, default = vars[str]) for str in vars])
 
 
-# In[63]:
+# In[102]:
 
 
 def copy_module(module):
@@ -320,7 +321,7 @@ def copy_module(module):
     return new
 
 
-# In[64]:
+# In[103]:
 
 
 def parameterize(nb):
@@ -344,7 +345,7 @@ def parameterize(nb):
     return run
 
 
-# In[65]:
+# In[104]:
 
 
 def lines_to_ast(lines):
@@ -359,7 +360,7 @@ def lines_to_ast(lines):
     return module
 
 
-# In[66]:
+# In[105]:
 
 
 def from_file(path, loader=Notebook, capture=False):
@@ -388,7 +389,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[67]:
+# In[106]:
 
 
 def repr_markdown(module):
@@ -421,6 +422,12 @@ if 1 and __name__ ==  '__main__':
 # [Transform the full block][transform]
 # 
 # [transform]: http://ipython.readthedocs.io/en/stable/config/inputtransforms.html#transforming-a-full-block
+
+# In[79]:
+
+
+from composites import x
+
 
 # In[69]:
 

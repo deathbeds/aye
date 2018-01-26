@@ -404,7 +404,7 @@ def repr_markdown(module):
     return module
 
 
-# In[ ]:
+# In[108]:
 
 
 if 1 and __name__ ==  '__main__':
@@ -423,13 +423,7 @@ if 1 and __name__ ==  '__main__':
 # 
 # [transform]: http://ipython.readthedocs.io/en/stable/config/inputtransforms.html#transforming-a-full-block
 
-# In[79]:
-
-
-from composites import x
-
-
-# In[69]:
+# In[111]:
 
 
 from IPython.core.inputtransformer import InputTransformer

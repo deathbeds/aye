@@ -172,7 +172,7 @@ class Partial(SourceFileLoader):
             _bootstrap._call_with_frames_removed(exec, code, module.__dict__, module.__dict__)
             module.__complete__ = True
         except BaseException as Exception: module.__complete__ = Exception
-        return module #repr_markdown(module)
+        return module
     
     __complete__ = False
 
@@ -203,7 +203,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[9]:
+# In[25]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -219,7 +219,11 @@ def NBDecoder(s_and_end, strict, scan_once, object_hook,
         type, object = object['cell_type'], object['source']
         object = ''.join(object) if isinstance(object, list) else object            
         id = doc.count('\n', 0, id + doc[id:next].find(object and object.splitlines()[0] or 'source'))
-        object = id, (object if type == 'code' else comment_lines(object))
+        object = id, (
+            object 
+            if type == 'code' 
+            else indent(comment_lines(object), 4)
+        )
     elif 'cells' in object:
         object = object['cells']
 
@@ -238,7 +242,7 @@ def new_decoder():
 
 # # Utilities
 
-# In[10]:
+# In[26]:
 
 
 import sys
@@ -269,7 +273,7 @@ def vars_to_sig(vars):
     return Signature([Parameter(str, Parameter.KEYWORD_ONLY, default = vars[str]) for str in vars])
 
 
-# In[11]:
+# In[27]:
 
 
 def copy_module(module):
@@ -279,7 +283,7 @@ def copy_module(module):
     return new
 
 
-# In[12]:
+# In[28]:
 
 
 def parameterize(nb):
@@ -303,7 +307,7 @@ def parameterize(nb):
     return run
 
 
-# In[13]:
+# In[29]:
 
 
 def lines_to_ast(lines):
@@ -318,7 +322,7 @@ def lines_to_ast(lines):
     return module
 
 
-# In[14]:
+# In[30]:
 
 
 def from_file(path, loader=Notebook, capture=False):
@@ -347,7 +351,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[15]:
+# In[ ]:
 
 
 if 1 and __name__ ==  '__main__':

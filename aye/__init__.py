@@ -20,6 +20,16 @@ as a control flow to ignore stay
 """
 
 
+# In[2]:
+
+
+def transform(x): 
+    ip = __import__('IPython').get_ipython()
+    if ip:
+        x = ip.input_transformer_manager.transform_cell(x)
+    return x
+
+
 # ## Updating `sys.path_hooks`
 # 
 # [Registering path hooks][302], [Import Hooks][imp]
@@ -27,7 +37,7 @@ as a control flow to ignore stay
 # [302]: https://www.python.org/dev/peps/pep-0302/#id28
 # [imp]: https://docs.python.org/3/reference/import.html#import-hooks
 
-# In[90]:
+# In[3]:
 
 
 def update_hooks(*loaders):
@@ -62,14 +72,14 @@ def update_hooks(*loaders):
 # [jup]: http://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Importing%20Notebooks.html#Register-the-hook
 # [importable]: https://github.com/tonyfast/importable/blob/master/importable.py#L83
 
-# In[91]:
+# In[4]:
 
 
 from IPython.utils.capture import capture_output
 from IPython.display import publish_display_data
 
 
-# In[92]:
+# In[5]:
 
 
 from contextlib import contextmanager
@@ -96,7 +106,7 @@ def Import(*loaders, capture=False):
 
 # # Notebook Source File Loader
 
-# In[93]:
+# In[6]:
 
 
 from importlib.machinery import SourceFileLoader
@@ -121,7 +131,7 @@ from importlib.machinery import SourceFileLoader
 #     
 # to return a __traceback__.  A successful import will `assert nb.__complete__`.
 
-# In[94]:
+# In[7]:
 
 
 class Partial(SourceFileLoader):
@@ -167,7 +177,7 @@ class Partial(SourceFileLoader):
     __complete__ = False
 
 
-# In[95]:
+# In[8]:
 
 
 class Notebook(Partial):
@@ -193,7 +203,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[96]:
+# In[9]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -224,63 +234,11 @@ def new_decoder():
     return decoder
 
 
-# # Literate Markdown Tools
-
-# In[97]:
-
-
-from nbconvert.filters.markdown_mistune import IPythonRenderer, MarkdownWithMath
-class Markdown(MarkdownWithMath):
-    """A mistune.Markdown object that accumulates the source code in the markdown body.
-    """
-    def render(Markdown, text):
-        from nbconvert.filters import ipython2python
-        Markdown.renderer.source = """"""
-        return [super().render(text), ipython2python(Markdown.renderer.source)][-1]
-
-
-# In[98]:
-
-
-class Renderer(IPythonRenderer):
-    """A mistune.Renderer to use with `aye.Markdown`."""
-    def __init__(Renderer, *args, **kwargs): 
-        Renderer.source = super().__init__(*args, **kwargs) or """"""
-
-    def block_code(Renderer, str, lang=None):
-        Renderer.source += '\n' + str
-        return super().block_code(str, lang=lang)
-
-
-# In[99]:
-
-
-class Literate(Notebook):
-    """A loader for literate Markdown notebooks."""
-    def source_to_lines(Notebook, data, body=""""""): 
-        md = Markdown(Renderer())
-        for id, str in super().source_to_lines(data): 
-            yield id, (md.render(str), md.renderer.source)[-1]
-
-
-# In[100]:
-
-
-class MD(Partial):
-    EXTENSION_SUFFIXES = '.md', '.markdown'
-    def source_to_lines(Notebook, data, body=""""""): 
-        from textwrap import dedent
-        from nbconvert.filters import ipython2python
-        md = Markdown(Renderer())
-        md.render(data)
-        yield 1, ipython2python(dedent(md.renderer.source))
-
-
 # # IPython tools
 
 # # Utilities
 
-# In[101]:
+# In[10]:
 
 
 import sys
@@ -311,7 +269,7 @@ def vars_to_sig(vars):
     return Signature([Parameter(str, Parameter.KEYWORD_ONLY, default = vars[str]) for str in vars])
 
 
-# In[102]:
+# In[11]:
 
 
 def copy_module(module):
@@ -321,7 +279,7 @@ def copy_module(module):
     return new
 
 
-# In[103]:
+# In[12]:
 
 
 def parameterize(nb):
@@ -345,7 +303,7 @@ def parameterize(nb):
     return run
 
 
-# In[104]:
+# In[13]:
 
 
 def lines_to_ast(lines):
@@ -355,12 +313,12 @@ def lines_to_ast(lines):
     from ast import Module, parse, increment_lineno
     from nbconvert.filters import ipython2python
     module = Module(body=[])
-    for id, str in lines: module.body.extend(
-        increment_lineno(node, id) for node in parse(ipython2python(str)).body)
+    for id, str in lines: 
+        module.body.extend(increment_lineno(node, id) for node in parse(transform(str)).body)
     return module
 
 
-# In[105]:
+# In[14]:
 
 
 def from_file(path, loader=Notebook, capture=False):
@@ -389,22 +347,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[106]:
-
-
-def repr_markdown(module):
-    """Attach a [Markdown Formatter][format] to modules loaded by `aye`.
-    
-    [format]: http://ipython.readthedocs.io/en/stable/api/generated/IPython.core.formatters.html#IPython.core.formatters.MarkdownFormatter
-    """
-    from types import MethodType
-    def _repr_markdown_(module):
-        return "`%s`\n\n---\n%s"%(repr(module), module.__doc__ or """""")
-    module._repr_markdown_ = MethodType(_repr_markdown_, module)
-    return module
-
-
-# In[108]:
+# In[15]:
 
 
 if 1 and __name__ ==  '__main__':
@@ -417,40 +360,9 @@ if 1 and __name__ ==  '__main__':
     get_ipython().system('mv aye.html ../docs/index.html')
 
 
-# # Permissive Markdown Source
-# 
-# [Transform the full block][transform]
-# 
-# [transform]: http://ipython.readthedocs.io/en/stable/config/inputtransforms.html#transforming-a-full-block
-
-# In[111]:
-
-
-from IPython.core.inputtransformer import InputTransformer
-
-class Transformer(__import__('collections').UserList, InputTransformer):
-    push = __import__('collections').UserList.append        
-    def reset(Transformer): 
-        source, Transformer.data = '\n'.join(Transformer), []
-        return Markdown(Renderer()).render(source)
-
-
 # ### Indenting Code
 
-# In[70]:
-
-
-def register_transforms(ip=None):
-    from IPython import get_ipython
-    global _NATIVE_TRANSFORM
-    ip = ip or get_ipython()
-    _NATIVE_TRANSFORM = globals().get('_NATIVE_TRANSFORM', ip.input_transformer_manager)
-    ip.input_transformer_manager.logical_line_transforms = []
-    ip.input_transformer_manager.physical_line_transforms = []
-    ip.input_transformer_manager.python_line_transforms = [Transformer()]
-
-
-# In[74]:
+# In[16]:
 
 
 if __name__ == '__main__':

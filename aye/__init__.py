@@ -203,7 +203,7 @@ class Notebook(Partial):
 # 
 # > `nbformat` is not formally called, it is assumed the data structure is valid.
 
-# In[25]:
+# In[9]:
 
 
 from json.decoder import WHITESPACE, WHITESPACE_STR
@@ -242,7 +242,7 @@ def new_decoder():
 
 # # Utilities
 
-# In[26]:
+# In[10]:
 
 
 import sys
@@ -273,7 +273,7 @@ def vars_to_sig(vars):
     return Signature([Parameter(str, Parameter.KEYWORD_ONLY, default = vars[str]) for str in vars])
 
 
-# In[27]:
+# In[11]:
 
 
 def copy_module(module):
@@ -283,7 +283,7 @@ def copy_module(module):
     return new
 
 
-# In[28]:
+# In[12]:
 
 
 def parameterize(nb):
@@ -307,7 +307,7 @@ def parameterize(nb):
     return run
 
 
-# In[29]:
+# In[13]:
 
 
 def lines_to_ast(lines):
@@ -322,7 +322,7 @@ def lines_to_ast(lines):
     return module
 
 
-# In[30]:
+# In[14]:
 
 
 def from_file(path, loader=Notebook, capture=False):
@@ -351,7 +351,16 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[ ]:
+# In[17]:
+
+
+def load_ipython_extension(ip=None):
+    update_hooks(Notebook)
+def unload_ipython_extension(ip=None):
+    update_hooks()
+
+
+# In[15]:
 
 
 if 1 and __name__ ==  '__main__':

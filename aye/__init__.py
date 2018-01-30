@@ -222,7 +222,7 @@ def NBDecoder(s_and_end, strict, scan_once, object_hook,
         object = id, (
             object 
             if type == 'code' 
-            else indent(comment_lines(object), 4)
+            else '\n' + indent(comment_lines(object), 4)
         )
     elif 'cells' in object:
         object = object['cells']
@@ -351,7 +351,7 @@ def from_file(path, loader=Notebook, capture=False):
     return module
 
 
-# In[17]:
+# In[15]:
 
 
 def load_ipython_extension(ip=None):
@@ -360,7 +360,7 @@ def unload_ipython_extension(ip=None):
     update_hooks()
 
 
-# In[15]:
+# In[16]:
 
 
 if 1 and __name__ ==  '__main__':
@@ -375,7 +375,7 @@ if 1 and __name__ ==  '__main__':
 
 # ### Indenting Code
 
-# In[16]:
+# In[17]:
 
 
 if __name__ == '__main__':

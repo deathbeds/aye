@@ -283,7 +283,7 @@ def copy_module(module):
     return new
 
 
-# In[12]:
+# In[18]:
 
 
 def parameterize(nb):
@@ -305,6 +305,9 @@ def parameterize(nb):
     run.__signature__ = vars_to_sig(variables)
     run.__doc__ = nb.__doc__
     return run
+
+def interactive(nb): 
+    return __import__('ipywidgets').interact(nb)
 
 
 # In[13]:

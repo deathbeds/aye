@@ -1,7 +1,12 @@
 __import__('setuptools').setup(
-    name="eye",
-    version="0.0.🖕",
+    name="aye",
+    version="0.0.1",
     author="Tony Fast", author_email="tony.fast@gmail.com",
     description="Interactive Notebook Modules.", 
     license="BSD-3-Clause",
-    packages=['eye'])
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-ipynb'],
+    install_requires=['ipython', 'nbconvert'],
+    include_package_data=True,
+    packages=['aye'],
+)
